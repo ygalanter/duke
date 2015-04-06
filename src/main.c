@@ -7,9 +7,8 @@ EffectLayer *effect_layer_hours, *effect_layer_minutes;
 
 char buffer_hours[] = "00";
 char buffer_minutes[] = "00"; 
-bool dots_inverted = true;
+bool dots_visible = true;
 
-AppTimer *timer;
 
 // utility function to create text layers
 TextLayer * create_color_layer(GRect coords, char text[], GColor color, GColor bgcolor) {
@@ -26,42 +25,41 @@ TextLayer * create_color_layer(GRect coords, char text[], GColor color, GColor b
   
 }
 
-//timer callback function
-void timer_callback(void *data) {
-  
-    Layer *layer = text_layer_get_layer(text_layer_dots);
-  
-    // hiding or showing dots
-    if (dots_inverted) 
-       layer_set_frame(layer, GRect(0, 0, 0 ,0));
-    else  
-       layer_set_frame(layer,GRect(52, -8, 50, 100));
-  
-    dots_inverted = !dots_inverted;
- 
-    timer = app_timer_register(1000, (AppTimerCallback) timer_callback, NULL);
-}
-
 
 // on time tick - set new values of minute & hour
-void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed)
+void handle_time_tick(struct tm *tick_time, TimeUnits units_changed)
 {
   
-    if (!clock_is_24h_style()) {
+    if (units_changed & SECOND_UNIT) { // on seconds change only blink dots
+      
+      if (dots_visible) 
+         text_layer_set_text(text_layer_dots, " ");
+      else  
+         text_layer_set_text(text_layer_dots, "..");
     
-        if( tick_time->tm_hour > 11 ) {   // YG Jun-25-2014: 0..11 - am 12..23 - pm
-            if( tick_time->tm_hour > 12 ) tick_time->tm_hour -= 12;
-        } else {
-            if( tick_time->tm_hour == 0 ) tick_time->tm_hour = 12;
-        }        
+      dots_visible = !dots_visible;
+      
     }
- 
-    strftime(buffer_hours, sizeof("00"), "%H", tick_time);
-    strftime(buffer_minutes, sizeof("00"), "%M", tick_time);
-    
-    text_layer_set_text(text_layer_hours, buffer_hours);
-    text_layer_set_text(text_layer_minutes, buffer_minutes);
-   
+  
+    if (units_changed & MINUTE_UNIT) { // on minutes change - change minutes
+      strftime(buffer_minutes, sizeof("00"), "%M", tick_time);
+      text_layer_set_text(text_layer_minutes, buffer_minutes);  
+    }  
+  
+    if (units_changed & HOUR_UNIT) { // on hours change - change hours
+        
+      if (!clock_is_24h_style()) {
+            if( tick_time->tm_hour > 11 ) {   // YG Jun-25-2014: 0..11 - am 12..23 - pm
+                if( tick_time->tm_hour > 12 ) tick_time->tm_hour -= 12;
+            } else {
+                if( tick_time->tm_hour == 0 ) tick_time->tm_hour = 12;
+            }        
+        }
+     
+        strftime(buffer_hours, sizeof("00"), "%H", tick_time);
+        text_layer_set_text(text_layer_hours, buffer_hours);
+    }  
+  
 }  
 
 
@@ -87,20 +85,30 @@ void handle_init(void) {
   
   //creating text layer for dots
   text_layer_dots = create_color_layer(GRect(52, -8, 50, 100), "..", GColorWhite, GColorClear);
+  
+  //Get a time structure so that the face doesn't start blank
+  time_t temp = time(NULL);
+  struct tm *t = localtime(&temp);
  
-  //kicking of tick & timer services
-  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
-  timer = app_timer_register(1000, (AppTimerCallback) timer_callback, NULL);
+  //Manually call the tick handler when the window is loading
+  handle_time_tick(t, HOUR_UNIT | MINUTE_UNIT);
+  
+ 
+  //kicking of tick service
+  tick_timer_service_subscribe(SECOND_UNIT, handle_time_tick);
+  
 }
 
 void handle_deinit(void) {
   text_layer_destroy(text_layer_hours);
+  text_layer_destroy(text_layer_minutes);
+  text_layer_destroy(text_layer_dots);
+  
   effect_layer_destroy(effect_layer_hours);
   effect_layer_destroy(effect_layer_minutes);
   window_destroy(my_window);
   
   tick_timer_service_unsubscribe();
-  app_timer_cancel(timer);
 }
 
 int main(void) {
