@@ -1,0 +1,38 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "yuri@galanter.net",
+    "longName": "Duke",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/duke_menu.png",
+                "menuIcon": true,
+                "name": "MENU",
+                "type": "png"
+            },
+            {
+                "characterRegex": "[0-9.]",
+                "file": "fonts/Duke.otf",
+                "name": "DUKE_97",
+                "trackingAdjust": 8,
+                "type": "font"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "Duke",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "70b3c606-e781-417f-bc89-6a32c4120f94",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
