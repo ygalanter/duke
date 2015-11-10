@@ -9,6 +9,14 @@ char buffer_hours[] = "00";
 char buffer_minutes[] = "00"; 
 bool dots_visible = true;
 
+#ifndef PBL_SDK_2
+static void app_focus_changed(bool focused) {
+  if (focused) { // on resuming focus - restore background
+    layer_mark_dirty(effect_layer_get_layer(effect_layer_hours));
+  }
+}
+#endif
+
 
 // utility function to create text layers
 TextLayer * create_color_layer(GRect coords, char text[], GColor color, GColor bgcolor) {
@@ -65,6 +73,15 @@ void handle_time_tick(struct tm *tick_time, TimeUnits units_changed)
 
 
 void handle_init(void) {
+  
+    #ifndef PBL_SDK_2
+  // need to catch when app resumes focus after notification, otherwise background won't restore
+  app_focus_service_subscribe_handlers((AppFocusHandlers){
+    .did_focus = app_focus_changed
+  });
+  #endif
+  
+  
   my_window = window_create();
   window_set_background_color(my_window, GColorBlack);
   window_stack_push(my_window, true);
@@ -100,6 +117,11 @@ void handle_init(void) {
 }
 
 void handle_deinit(void) {
+  
+  #ifndef PBL_SDK_2
+    app_focus_service_unsubscribe();
+  #endif
+  
   text_layer_destroy(text_layer_hours);
   text_layer_destroy(text_layer_minutes);
   text_layer_destroy(text_layer_dots);
