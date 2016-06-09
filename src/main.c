@@ -1,5 +1,5 @@
 #include <pebble.h>
-#include "effect_layer.h"
+#include <pebble-effect-layer/pebble-effect-layer.h>
 
 Window *my_window;
 TextLayer *text_layer_hours, *text_layer_minutes, *text_layer_dots;
@@ -92,12 +92,12 @@ void handle_init(void) {
   
   // creating effect layer to rotate minutes
   effect_layer_minutes = effect_layer_create(GRect(25,0,90,80));
-  effect_layer_set_effect(effect_layer_minutes, EFFECT_ROTATE_LEFT );
+  effect_layer_add_effect(effect_layer_minutes, effect_rotate_90_degrees, (void *)0);
   layer_add_child(window_get_root_layer(my_window), effect_layer_get_layer(effect_layer_minutes));
   
   // creating effect layer to rotate hours
   effect_layer_hours = effect_layer_create(GRect(25,80,90,80));
-  effect_layer_set_effect(effect_layer_hours, EFFECT_ROTATE_LEFT );
+  effect_layer_add_effect(effect_layer_hours, effect_rotate_90_degrees, (void *)0);
   layer_add_child(window_get_root_layer(my_window), effect_layer_get_layer(effect_layer_hours));
   
   //creating text layer for dots

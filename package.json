@@ -1,0 +1,44 @@
+{
+    "author": "yuri@galanter.net",
+    "dependencies": {
+        "pebble-effect-layer": "^1.1.0"
+    },
+    "keywords": [],
+    "name": "duke",
+    "pebble": {
+        "capabilities": [
+            ""
+        ],
+        "displayName": "Duke",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/duke_menu.png",
+                    "menuIcon": true,
+                    "name": "MENU",
+                    "type": "bitmap"
+                },
+                {
+                    "characterRegex": "[0-9.]",
+                    "file": "fonts/Duke.otf",
+                    "name": "DUKE_97",
+                    "trackingAdjust": 8,
+                    "type": "font"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt"
+        ],
+        "uuid": "70b3c606-e781-417f-bc89-6a32c4120f94",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "1.5.0"
+}
